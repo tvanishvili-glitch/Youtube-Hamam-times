@@ -1,225 +1,214 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HamamTimesTV - Topic Analytics Explorer</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        /* Import a friendly, modern font from Google Fonts */
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analytics Dashboard</title>
 
-        body {
-            font-family: 'Nunito', sans-serif;
-            background-color: #F3F4F6; /* Very soft gray-blue background */
-            color: #2D3748;
-            margin: 0;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .dashboard-container {
-            background: #FFFFFF;
-            padding: 40px;
-            width: 100%;
-            max-width: 1050px;
-            border-radius: 24px; /* Large friendly rounded corners */
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04); /* Soft floating shadow */
-        }
-        h1 {
-            text-align: center;
-            color: #2D3748;
-            margin-bottom: 8px;
-            font-weight: 800;
-            font-size: 32px;
-        }
-        p.subtitle {
-            text-align: center;
-            color: #A0AEC0;
-            margin-bottom: 35px;
-            font-weight: 600;
-            font-size: 16px;
-        }
-        .controls {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 40px;
-        }
-        button {
-            padding: 12px 24px;
-            font-size: 15px;
-            font-weight: 700;
-            font-family: 'Nunito', sans-serif;
-            color: #4A5568;
-            background-color: #EDF2F7;
-            border: none;
-            border-radius: 50px; /* Pill-shaped buttons */
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        button:hover {
-            background-color: #E2E8F0;
-            transform: translateY(-2px); /* Slight lift effect on hover */
-        }
-        button.active {
-            background-color: #4299E1; /* Friendly bright blue */
-            color: #FFFFFF;
-            box-shadow: 0 4px 15px rgba(66, 153, 225, 0.35); /* Glowing shadow for active state */
-        }
-        .chart-container {
-            position: relative;
-            height: 550px;
-            width: 100%;
-        }
-    </style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+
+:root {
+    --bg: #EDEDED;
+    --card: #FFFFFF;
+    --primary: #A63D36;
+    --primary-dark: #8E332D;
+    --text: #1A1A1A;
+    --muted: #6B6B6B;
+    --button-bg: #E0E0E0;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Lato', sans-serif;
+    background: var(--bg);
+}
+
+/* Outer wrapper */
+.wrapper {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Slide container */
+.dashboard-container {
+    width: 95vw;
+    height: 95vh;
+    max-width: 1280px;
+    max-height: 720px;
+
+    background: var(--card);
+    border-radius: 16px;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    padding: 20px;
+}
+
+/* Chart */
+.chart-container {
+    flex: 3;
+    min-width: 0;
+    height: 100%;
+    position: relative;
+}
+
+canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* Controls */
+.controls {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 12px;
+}
+
+button {
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    background: var(--button-bg);
+    color: var(--text);
+    transition: 0.2s;
+}
+
+button:hover {
+    transform: translateY(-1px);
+}
+
+button.active {
+    background: var(--primary);
+    color: white;
+}
+</style>
 </head>
+
 <body>
 
-<div class="dashboard-container">
-    <h1>HamamTimesTV Analytics</h1>
-    <p class="subtitle">Performance Breakdown by Topic Category</p>
+<div class="wrapper">
+    <div class="dashboard-container">
 
-    <div class="controls">
-        <button id="btnAvgViews" class="active" onclick="updateChart('Avg_Views', 'Average Views per Video', '#4299E1', '#3182CE')">Average Views</button>
-        <button id="btnTotalViews" onclick="updateChart('Total_Views', 'Total Views', '#48BB78', '#38A169')">Total Views</button>
-        <button id="btnSubs" onclick="updateChart('Total_Subs', 'Subscribers Gained', '#9F7AEA', '#805AD5')">Subscribers Gained</button>
-        <button id="btnCount" onclick="updateChart('Count', 'Number of Videos', '#ED8936', '#DD6B20')">Upload Volume</button>
-    </div>
+        <div class="chart-container">
+            <canvas id="myChart"></canvas>
+        </div>
 
-    <div class="chart-container">
-        <canvas id="myChart"></canvas>
+        <div class="controls">
+            <button id="btnAvgViews">Average Views</button>
+            <button id="btnTotalViews">Total Views</button>
+            <button id="btnSubs">Subscribers Gained</button>
+            <button id="btnCount">Upload Volume</button>
+        </div>
+
     </div>
 </div>
 
 <script>
-    // Data generated from the Excel file provided
-    const rawData = [
-      { "Topics": "Sports", "Count": 7, "Total_Views": 1029569, "Avg_Views": 147081, "Total_Subs": 985 },
-      { "Topics": "Satire, Viral & Trends", "Count": 14, "Total_Views": 1826922, "Avg_Views": 130494, "Total_Subs": 1500 },
-      { "Topics": "Corruption & Elites", "Count": 17, "Total_Views": 1781838, "Avg_Views": 104814, "Total_Subs": 1572 },
-      { "Topics": "Animals & Pets", "Count": 2, "Total_Views": 205534, "Avg_Views": 102767, "Total_Subs": 111 },
-      { "Topics": "Weather & Flooding", "Count": 14, "Total_Views": 1386783, "Avg_Views": 99055, "Total_Subs": 637 },
-      { "Topics": "Social Outrage & Tragedy", "Count": 15, "Total_Views": 1460911, "Avg_Views": 97394, "Total_Subs": 1821 },
-      { "Topics": "Regional Politics & Karabakh", "Count": 24, "Total_Views": 1957952, "Avg_Views": 81581, "Total_Subs": 1408 },
-      { "Topics": "Economy, Utilities & Workers", "Count": 12, "Total_Views": 914326, "Avg_Views": 76193, "Total_Subs": 583 },
-      { "Topics": "Crime, Justice & Prison", "Count": 12, "Total_Views": 858843, "Avg_Views": 71570, "Total_Subs": 781 },
-      { "Topics": "Global Politics & Conflicts", "Count": 15, "Total_Views": 625403, "Avg_Views": 41693, "Total_Subs": 455 }
-    ];
+const rawData = [
+  { "Topics": "Sports", "Count": 7, "Total_Views": 1029569, "Avg_Views": 147081, "Total_Subs": 985 },
+  { "Topics": "Satire, Viral & Trends", "Count": 14, "Total_Views": 1826922, "Avg_Views": 130494, "Total_Subs": 1500 },
+  { "Topics": "Corruption & Elites", "Count": 17, "Total_Views": 1781838, "Avg_Views": 104814, "Total_Subs": 1572 },
+  { "Topics": "Animals & Pets", "Count": 2, "Total_Views": 205534, "Avg_Views": 102767, "Total_Subs": 111 },
+  { "Topics": "Weather & Flooding", "Count": 14, "Total_Views": 1386783, "Avg_Views": 99055, "Total_Subs": 637 },
+  { "Topics": "Social Outrage & Tragedy", "Count": 15, "Total_Views": 1460911, "Avg_Views": 97394, "Total_Subs": 1821 },
+  { "Topics": "Regional Politics & Karabakh", "Count": 24, "Total_Views": 1957952, "Avg_Views": 81581, "Total_Subs": 1408 },
+  { "Topics": "Economy, Utilities & Workers", "Count": 12, "Total_Views": 914326, "Avg_Views": 76193, "Total_Subs": 583 },
+  { "Topics": "Crime, Justice & Prison", "Count": 12, "Total_Views": 858843, "Avg_Views": 71570, "Total_Subs": 781 },
+  { "Topics": "Global Politics & Conflicts", "Count": 15, "Total_Views": 625403, "Avg_Views": 41693, "Total_Subs": 455 }
+];
 
-    let chartInstance = null;
+let chartInstance = null;
 
-    function updateChart(metric, labelText, mainColor, hoverColor) {
-        // Update active button styling
-        document.querySelectorAll('button').forEach(btn => {
-            btn.classList.remove('active');
-            btn.style.backgroundColor = ''; // Reset custom colors
-            btn.style.boxShadow = '';
-        });
-        
-        const activeBtn = event.target;
-        activeBtn.classList.add('active');
-        activeBtn.style.backgroundColor = mainColor;
-        activeBtn.style.boxShadow = `0 4px 15px ${mainColor}66`; // 66 adds transparency to the hex code
+const buttons = {
+    Avg_Views: document.getElementById('btnAvgViews'),
+    Total_Views: document.getElementById('btnTotalViews'),
+    Total_Subs: document.getElementById('btnSubs'),
+    Count: document.getElementById('btnCount')
+};
 
-        // Sort data dynamically
-        const sortedData = [...rawData].sort((a, b) => b[metric] - a[metric]);
+function updateChart(metric, labelText, activeBtn) {
 
-        const labels = sortedData.map(d => d.Topics);
-        const dataValues = sortedData.map(d => d[metric]);
+    Object.values(buttons).forEach(btn => {
+        btn.classList.remove('active');
+        btn.style.background = '#E0E0E0';
+    });
 
-        const ctx = document.getElementById('myChart').getContext('2d');
+    activeBtn.classList.add('active');
+    activeBtn.style.background = '#A63D36';
 
-        if (chartInstance) {
-            chartInstance.destroy(); 
-        }
+    const sorted = [...rawData].sort((a, b) => b[metric] - a[metric]);
 
-        chartInstance = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: labelText,
-                    data: dataValues,
-                    backgroundColor: mainColor,
-                    hoverBackgroundColor: hoverColor,
-                    borderRadius: 8, // Soft rounded edges on the bars
-                    borderSkipped: false // Ensures all corners are rounded beautifully
-                }]
+    const labels = sorted.map(d => d.Topics);
+    const values = sorted.map(d => d[metric]);
+
+    const ctx = document.getElementById('myChart').getContext('2d');
+
+    if (chartInstance) chartInstance.destroy();
+
+    chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: labelText,
+                data: values,
+                backgroundColor: '#A63D36',
+                hoverBackgroundColor: '#8E332D',
+                borderRadius: 6
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: { padding: 10 },
+
+            plugins: {
+                legend: { display: false }
             },
-            options: {
-                indexAxis: 'y', 
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        backgroundColor: '#2D3748',
-                        padding: 12,
-                        titleFont: { family: 'Nunito', size: 14 },
-                        bodyFont: { family: 'Nunito', size: 14, weight: 'bold' },
-                        cornerRadius: 8,
-                        displayColors: false,
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed.x !== null) {
-                                    label += new Intl.NumberFormat('en-US').format(context.parsed.x);
-                                }
-                                return label;
-                            }
-                        }
-                    }
+
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    grid: { color: '#DADADA' },
+                    ticks: { color: '#6B6B6B' }
                 },
-                scales: {
-                    x: {
-                        beginAtZero: true,
-                        grid: {
-                            color: '#EDF2F7', // Very light grid lines
-                            drawBorder: false
-                        },
-                        ticks: {
-                            color: '#718096',
-                            font: { family: 'Nunito', size: 13, weight: '600' },
-                            callback: function(value) {
-                                if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M';
-                                if (value >= 1000) return (value / 1000).toFixed(0) + 'K';
-                                return value;
-                            }
-                        }
-                    },
-                    y: {
-                        grid: {
-                            display: false,
-                            drawBorder: false
-                        },
-                        ticks: {
-                            color: '#4A5568',
-                            font: { family: 'Nunito', size: 14, weight: '700' }
-                        }
-                    }
-                },
-                animation: {
-                    duration: 800, // Slightly slower, smoother animation
-                    easing: 'easeOutQuart'
+                y: {
+                    ticks: { color: '#1A1A1A', autoSkip: false },
+                    grid: { display: false }
                 }
             }
-        });
-    }
+        }
+    });
+}
 
-    // Initialize chart
-    window.onload = function() {
-        const firstBtn = document.getElementById('btnAvgViews');
-        // Simulate a click on the first button so the colors map correctly
-        firstBtn.click();
-    };
+/* Button bindings */
+buttons.Avg_Views.onclick = () => updateChart('Avg_Views', 'Average Views', buttons.Avg_Views);
+buttons.Total_Views.onclick = () => updateChart('Total_Views', 'Total Views', buttons.Total_Views);
+buttons.Total_Subs.onclick = () => updateChart('Total_Subs', 'Subscribers', buttons.Total_Subs);
+buttons.Count.onclick = () => updateChart('Count', 'Upload Volume', buttons.Count);
+
+/* Init */
+window.onload = () => {
+    buttons.Avg_Views.click();
+};
 </script>
 
 </body>
