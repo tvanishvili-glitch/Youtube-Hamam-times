@@ -6,10 +6,13 @@
     <title>HamamTimesTV - Topic Analytics Explorer</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        /* Import a friendly, modern font from Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #ffffff;
-            color: #333333;
+            font-family: 'Nunito', sans-serif;
+            background-color: #F3F4F6; /* Very soft gray-blue background */
+            color: #2D3748;
             margin: 0;
             padding: 40px;
             display: flex;
@@ -17,67 +20,73 @@
             align-items: center;
         }
         .dashboard-container {
-            background: #ffffff;
-            padding: 30px;
+            background: #FFFFFF;
+            padding: 40px;
             width: 100%;
-            max-width: 1000px;
+            max-width: 1050px;
+            border-radius: 24px; /* Large friendly rounded corners */
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04); /* Soft floating shadow */
         }
         h1 {
             text-align: center;
-            color: #333333;
-            margin-bottom: 10px;
-            font-weight: 600;
+            color: #2D3748;
+            margin-bottom: 8px;
+            font-weight: 800;
+            font-size: 32px;
         }
         p.subtitle {
             text-align: center;
-            color: #666666;
-            margin-bottom: 30px;
+            color: #A0AEC0;
+            margin-bottom: 35px;
+            font-weight: 600;
+            font-size: 16px;
         }
         .controls {
             display: flex;
             justify-content: center;
-            gap: 15px;
-            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 40px;
         }
         button {
-            padding: 10px 20px;
-            font-size: 14px;
-            font-weight: bold;
-            color: #333333;
-            background-color: #E6E6E6; /* Light gray from your slide */
+            padding: 12px 24px;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: 'Nunito', sans-serif;
+            color: #4A5568;
+            background-color: #EDF2F7;
             border: none;
-            border-radius: 4px;
+            border-radius: 50px; /* Pill-shaped buttons */
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
         }
         button:hover {
-            background-color: #D4D4D4;
+            background-color: #E2E8F0;
+            transform: translateY(-2px); /* Slight lift effect on hover */
         }
         button.active {
-            background-color: #A32A29; /* Dark Red/Maroon from your slide */
-            color: #ffffff;
+            background-color: #4299E1; /* Friendly bright blue */
+            color: #FFFFFF;
+            box-shadow: 0 4px 15px rgba(66, 153, 225, 0.35); /* Glowing shadow for active state */
         }
         .chart-container {
             position: relative;
             height: 550px;
             width: 100%;
-            background-color: #F2EBE3; /* Subtle beige background for the chart area */
-            padding: 20px;
-            border-radius: 4px;
         }
     </style>
 </head>
 <body>
 
 <div class="dashboard-container">
-    <h1>HamamTimesTV Topic Analytics</h1>
-    <p class="subtitle">Based on Top 100 Videos (Multi-Label Classification)</p>
+    <h1>HamamTimesTV Analytics</h1>
+    <p class="subtitle">Performance Breakdown by Topic Category</p>
 
     <div class="controls">
-        <button id="btnAvgViews" class="active" onclick="updateChart('Avg_Views', 'Average Views per Video')">Sort by Avg. Views</button>
-        <button id="btnTotalViews" onclick="updateChart('Total_Views', 'Total Views')">Sort by Total Views</button>
-        <button id="btnSubs" onclick="updateChart('Total_Subs', 'Total Subscribers Gained')">Sort by Subscribers</button>
-        <button id="btnCount" onclick="updateChart('Count', 'Number of Videos Uploaded')">Sort by Video Count</button>
+        <button id="btnAvgViews" class="active" onclick="updateChart('Avg_Views', 'Average Views per Video', '#4299E1', '#3182CE')">Average Views</button>
+        <button id="btnTotalViews" onclick="updateChart('Total_Views', 'Total Views', '#48BB78', '#38A169')">Total Views</button>
+        <button id="btnSubs" onclick="updateChart('Total_Subs', 'Subscribers Gained', '#9F7AEA', '#805AD5')">Subscribers Gained</button>
+        <button id="btnCount" onclick="updateChart('Count', 'Number of Videos', '#ED8936', '#DD6B20')">Upload Volume</button>
     </div>
 
     <div class="chart-container">
@@ -102,10 +111,18 @@
 
     let chartInstance = null;
 
-    function updateChart(metric, labelText) {
+    function updateChart(metric, labelText, mainColor, hoverColor) {
         // Update active button styling
-        document.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
+        document.querySelectorAll('button').forEach(btn => {
+            btn.classList.remove('active');
+            btn.style.backgroundColor = ''; // Reset custom colors
+            btn.style.boxShadow = '';
+        });
+        
+        const activeBtn = event.target;
+        activeBtn.classList.add('active');
+        activeBtn.style.backgroundColor = mainColor;
+        activeBtn.style.boxShadow = `0 4px 15px ${mainColor}66`; // 66 adds transparency to the hex code
 
         // Sort data dynamically
         const sortedData = [...rawData].sort((a, b) => b[metric] - a[metric]);
@@ -126,10 +143,10 @@
                 datasets: [{
                     label: labelText,
                     data: dataValues,
-                    backgroundColor: '#A32A29', // Dark Red from PPT
-                    hoverBackgroundColor: '#822120',
-                    borderRadius: 0, // Squared edges to match PPT styling
-                    borderWidth: 0
+                    backgroundColor: mainColor,
+                    hoverBackgroundColor: hoverColor,
+                    borderRadius: 8, // Soft rounded edges on the bars
+                    borderSkipped: false // Ensures all corners are rounded beautifully
                 }]
             },
             options: {
@@ -141,7 +158,12 @@
                         display: false
                     },
                     tooltip: {
-                        backgroundColor: '#333333',
+                        backgroundColor: '#2D3748',
+                        padding: 12,
+                        titleFont: { family: 'Nunito', size: 14 },
+                        bodyFont: { family: 'Nunito', size: 14, weight: 'bold' },
+                        cornerRadius: 8,
+                        displayColors: false,
                         callbacks: {
                             label: function(context) {
                                 let label = context.dataset.label || '';
@@ -160,10 +182,12 @@
                     x: {
                         beginAtZero: true,
                         grid: {
-                            color: '#D4D4D4'
+                            color: '#EDF2F7', // Very light grid lines
+                            drawBorder: false
                         },
                         ticks: {
-                            color: '#333333',
+                            color: '#718096',
+                            font: { family: 'Nunito', size: 13, weight: '600' },
                             callback: function(value) {
                                 if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M';
                                 if (value >= 1000) return (value / 1000).toFixed(0) + 'K';
@@ -173,19 +197,17 @@
                     },
                     y: {
                         grid: {
-                            display: false
+                            display: false,
+                            drawBorder: false
                         },
                         ticks: {
-                            color: '#333333',
-                            font: {
-                                size: 13,
-                                family: "'Segoe UI', Tahoma, sans-serif"
-                            }
+                            color: '#4A5568',
+                            font: { family: 'Nunito', size: 14, weight: '700' }
                         }
                     }
                 },
                 animation: {
-                    duration: 600,
+                    duration: 800, // Slightly slower, smoother animation
                     easing: 'easeOutQuart'
                 }
             }
@@ -194,9 +216,9 @@
 
     // Initialize chart
     window.onload = function() {
-        // Find the first button and make it active manually for the initial load
-        document.getElementById('btnAvgViews').classList.add('active');
-        updateChart('Avg_Views', 'Average Views per Video');
+        const firstBtn = document.getElementById('btnAvgViews');
+        // Simulate a click on the first button so the colors map correctly
+        firstBtn.click();
     };
 </script>
 
